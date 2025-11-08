@@ -1,8 +1,8 @@
 import FAQ from "@/components/faq";
-import { FeaturesStep } from "@/components/features1";
+import { FeaturesStep } from "@/components/features";
 import { Footer } from "@/components/footer-section";
+import HeroSection from "@/components/hero";
 
-import Hero1 from "@/components/hero1";
 import { LogoLoopMarquee } from "@/components/logo_marquee";
 import { TestimonialsSectionDemo } from "@/components/testimonials";
 
@@ -11,7 +11,7 @@ const Home = () => {
     <div className="min-h-screen">
       {/* <Navbar /> */}
 
-      <Hero1 />
+      <HeroSection />
       <LogoLoopMarquee />
       <FeaturesStep />
       <FAQ />
