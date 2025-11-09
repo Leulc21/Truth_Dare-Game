@@ -7,26 +7,33 @@ import type { RoughAnnotation } from "rough-notation/lib/model";
 interface HighlighterProps {
   children: React.ReactNode;
   action?: "highlight" | "circle";
-  color?: string;
+  color?: string; // accepts hsl(var(--primary)) or a raw color
 }
 
 export default function Highlighter({
   children,
   action = "highlight",
-  color = "#ffd1dc", // Default pink color
+  color = "hsl(var(--primary))", // default to ShadCN theme primary
 }: HighlighterProps) {
   const elementRef = useRef<HTMLSpanElement>(null);
   const annotationRef = useRef<RoughAnnotation | null>(null);
 
   useEffect(() => {
     if (elementRef.current) {
+      // ✅ Get the computed color from CSS variables (so theme mode works)
+      const temp = document.createElement("span");
+      temp.style.color = color;
+      document.body.appendChild(temp);
+      const computedColor = getComputedStyle(temp).color;
+      document.body.removeChild(temp);
+
       const annotation = annotate(elementRef.current, {
         type: action === "circle" ? "circle" : "highlight",
-        color: color,
+        color: computedColor, // now uses resolved theme color
         multiline: true,
         padding: action === "circle" ? 8 : 2,
-        iterations: 2, // More iterations for a natural effect
-        animationDuration: 500,
+        iterations: 2,
+        animationDuration: 800,
       });
 
       annotationRef.current = annotation;
@@ -36,7 +43,7 @@ export default function Highlighter({
     return () => {
       annotationRef.current?.remove();
     };
-  }, [action, color, elementRef.current]); // Added elementRef.current dependency
+  }, [action, color]);
 
   return (
     <span ref={elementRef} className="inline-block relative bg-transparent">
