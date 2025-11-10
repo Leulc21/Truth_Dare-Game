@@ -1,5 +1,7 @@
 "use client";
 
+import UserDropdown from "@/app/dashboard/components/userDropdown";
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import Switcher from "./ui/theme_switcher";
@@ -18,7 +20,7 @@ interface NavLinkProps {
 
 interface ButtonProps {
   children: React.ReactNode;
-  variant?: "primary" | "secondary" | "outline";
+  variant?: "primary" | "secondary" | "outline" | "ghost";
   className?: string;
   onClick?: () => void;
 }
@@ -98,23 +100,34 @@ const NavLink: React.FC<NavLinkProps> = ({
   </Link>
 );
 
-const Button: React.FC<ButtonProps> = ({
+const Button: React.FC<ButtonProps & { size?: "sm" | "md" | "lg" }> = ({
   children,
   variant = "primary",
+  size = "md",
   className = "",
   onClick,
 }) => {
   const base =
-    "px-5 py-2.5 rounded-lg font-semibold text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2";
+    "rounded-lg font-semibold text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2";
+
+  const sizes = {
+    sm: "px-3 py-1.5 text-sm",
+    md: "px-5 py-2.5 text-sm",
+    lg: "px-6 py-3 text-base",
+  };
+
   const styles = {
     primary: `bg-[${themeColor}] text-white hover:bg-[#c96947] focus:ring-[${themeColor}] shadow-lg`,
     secondary:
       "bg-white dark:bg-gray-900 text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700",
     outline: `border border-[${themeColor}] text-[${themeColor}] hover:bg-[${themeColor}] hover:text-white`,
+    ghost:
+      "bg-transparent text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800",
   };
+
   return (
     <button
-      className={`${base} ${styles[variant]} ${className}`}
+      className={`${base} ${sizes[size]} ${styles[variant]} ${className}`}
       onClick={onClick}
     >
       {children}
@@ -159,9 +172,6 @@ const MobileMenu: React.FC<MobileMenuProps> = ({
           </Button>
         </Link>
       </div>
-      <div className="px-4 flex justify-center">
-        <Switcher />
-      </div>
     </div>
   </div>
 );
@@ -171,14 +181,20 @@ export const Navbar: React.FC = () => {
   const [activeLink, setActiveLink] = useState("Home");
   const [isScrolled, setIsScrolled] = useState(false);
 
-  const navItems: NavItem[] = [
+  const { data: session, isPending } = authClient.useSession();
+
+  // Base nav items
+  const baseNavItems: NavItem[] = [
     { name: "Home", href: "/" },
     { name: "About us", href: "#about" },
     { name: "Features", href: "#features" },
     { name: "FAQ", href: "#faq" },
-    { name: "Contact", href: "#contact" },
-    { name: "Dashboard", href: "/dashboard" },
   ];
+
+  // Add Dashboard only if session exists
+  const navItems = session
+    ? [...baseNavItems, { name: "Dashboard", href: "/dashboard" }]
+    : baseNavItems;
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 10);
@@ -203,7 +219,8 @@ export const Navbar: React.FC = () => {
             </span>
           </Link>
 
-          <nav className="hidden md:flex items-center space-x-1 bg-white/50 dark:bg-gray-800/50 p-1.5 rounded-2xl backdrop-blur-sm border border-gray-200 dark:border-gray-700 shadow-sm">
+          {/* Desktop nav */}
+          <nav className="hidden md:flex items-center gap-2 bg-white/10 dark:bg-white/5 p-1.5 rounded-xl backdrop-blur-md transition-all duration-300">
             {navItems.map((item) => (
               <NavLink
                 key={item.name}
@@ -218,11 +235,27 @@ export const Navbar: React.FC = () => {
 
           <div className="hidden md:flex items-center space-x-4">
             <Switcher />
-            <Link href="/login">
-              <Button variant="outline">Login</Button>
-            </Link>
+            {isPending ? null : session ? (
+              <UserDropdown
+                name={
+                  session.user.name && session.user.name.length > 0
+                    ? session.user.name
+                    : session.user.email?.split("@")[0]
+                }
+                email={session.user.email}
+                image={
+                  session.user.image ??
+                  `https://avatar.vercel.sh/${session.user.email}?size=30`
+                }
+              />
+            ) : (
+              <Link href="/login">
+                <Button size="sm">Log In</Button>
+              </Link>
+            )}
           </div>
 
+          {/* Mobile menu button */}
           <div className="md:hidden flex items-center space-x-3">
             <Switcher />
             <button
@@ -235,6 +268,7 @@ export const Navbar: React.FC = () => {
         </div>
       </div>
 
+      {/* Mobile menu */}
       <MobileMenu
         isOpen={isMenuOpen}
         navItems={navItems}
