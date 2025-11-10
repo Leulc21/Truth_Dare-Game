@@ -9,14 +9,13 @@ datasource db {
 }
 
 model User {
-  id            Int        @id @default(autoincrement())
+  id            String    @id
   name          String
-  age           Int
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
-  email         String     @unique
-  emailVerified Boolean    @default(false)
+  email         String
+  emailVerified Boolean
   image         String?
+  createdAt     DateTime
+  updatedAt     DateTime
   sessions      Session[]
   accounts      Account[]
   games         Game[] 
@@ -25,24 +24,24 @@ model User {
 }
 
 model Session {
-  id        Int       @id @default(autoincrement())
+  id        String    @id @default(cuid()) // 👈 changed
   expiresAt DateTime
   token     String    @unique
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   ipAddress String?
   userAgent String?
-  userId    Int       // ✅ changed to Int
+  userId    String    // 👈 changed
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("session")
 }
 
 model Account {
-  id                    Int       @id @default(autoincrement())
+  id                    String    @id @default(cuid()) // 👈 changed
   accountId             String
   providerId            String
-  userId                Int       // ✅ changed to Int
+  userId                String    // 👈 changed
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
@@ -58,7 +57,7 @@ model Account {
 }
 
 model Verification {
-  id         Int       @id @default(autoincrement())
+  id         String    @id @default(cuid()) // 👈 changed
   identifier String
   value      String
   expiresAt  DateTime
@@ -69,19 +68,18 @@ model Verification {
 }
 
 model Game {
-  id           Int       @id @default(autoincrement())
+  id           Int       @id @default(autoincrement()) // 👈 keep as Int (custom model)
   title        String
   category     String
   difficulty   String
   environment  String
   totalPlayers Int
-  questions    Json       // Stores the AI-generated Truth/Dare data
+  questions    Json
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 
-  // Relation to User
-  userId Int
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String  // 👈 changed to match User.id type
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("game")
 }
