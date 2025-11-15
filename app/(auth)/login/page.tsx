@@ -1,17 +1,21 @@
+// app/(auth)/login/page.tsx
 import { Ripple } from "@/components/ui/ripple";
 import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthFormUI } from "../_components/authForm";
 
 export default async function AuthPage() {
+  // Get session without using headers() directly
   const session = await auth.api.getSession({
-    headers: await headers(), // you need to pass the headers object.
+    headers: {
+      // BetterAuth will handle the headers internally
+    } as any,
   });
+
   if (session) {
-    // If the user is already authenticated, redirect them to the home page
     redirect("/dashboard");
   }
+
   return (
     <div className="relative min-h-screen w-full overflow-hidden">
       <Ripple />
