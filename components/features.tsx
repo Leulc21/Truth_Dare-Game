@@ -5,25 +5,29 @@ const features = [
     step: "Step 1",
     title: "Log In & Join the Fun",
     content:
-      "Create an account or sign in to save your progress, track your games, and unlock personalized Truth & Dare experiences.",
-    image:
-      "https://images.unsplash.com/photo-1525182008055-f88b95ff7980?q=80&w=2070&auto=format&fit=crop",
+      "Sign up or log in to save your progress, manage your games, and enjoy personalized Truth & Dare experiences with friends.",
+    image: "/images/Screenshotlogin.png",
   },
   {
     step: "Step 2",
-    title: "Create Your Game",
+    title: "Access Your Dashboard",
     content:
-      "Choose your vibe — party, romantic, spicy, or chill. Select players, difficulty, and environment. Our AI will generate a unique game tailored just for your group.",
-    image:
-      "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=2070&auto=format&fit=crop",
+      "View your dashboard to manage existing games or start a new session. See all created games and their details at a glance.",
+    image: "/images/screenshotdash.png",
   },
   {
     step: "Step 3",
+    title: "Create Your Game",
+    content:
+      "Customize your game by selecting title, category, difficulty, environment, and number of players. Our AI generates a unique set of Truths & Dares for you.",
+    image: "/images/screenshootcreate.png",
+  },
+  {
+    step: "Step 4",
     title: "Start Playing",
     content:
-      "Flip cards, answer truths, take dares, and let the AI keep the game exciting. Every round is fresh, unpredictable, and full of fun.",
-    image:
-      "https://images.unsplash.com/photo-1533106418989-88406c7cc8c7?q=80&w=2070&auto=format&fit=crop",
+      "Flip cards, answer truths, take dares, and enjoy a dynamic, unpredictable game experience. Let the AI keep the fun going round after round.",
+    image: "/images/screenshotplay.png",
   },
 ];
 
