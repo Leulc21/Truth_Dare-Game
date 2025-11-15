@@ -2,14 +2,15 @@ import { Marquee } from "@/components/ui/marquee";
 import { cn } from "@/lib/utils";
 
 const logos = [
-  { name: "linux", img: "/images/linux.svg" },
-  { name: "react", img: "/images/rr.svg" },
-  { name: "mastercard", img: "/images/mastercard.svg" },
-  { name: "notion", img: "/images/notion.svg" },
-  { name: "mercedes", img: "/images/mercedes.svg" },
-  { name: "reddit", img: "/images/reddit.svg" },
-  { name: "mailchimp", img: "/images/mailchimp.svg" },
-  { name: "twitter", img: "/images/twitter.svg" },
+  { name: "Arif", img: "/icons/arif.svg" },
+  { name: "AASTU", img: "/icons/aastu.svg" },
+  { name: "AAU", img: "/icons/aau.svg" },
+  { name: "Arada", img: "/icons/arada.svg" },
+  { name: "Art", img: "/icons/art.svg" },
+  { name: "Pepsi", img: "/icons/pepsi.svg" },
+  { name: "Dink", img: "/icons/dink.svg" },
+  { name: "Habesha", img: "/icons/habesha.svg" },
+  { name: "Safaricom", img: "/icons/safaricom.svg" },
 ];
 
 export function LogoLoopMarquee() {
