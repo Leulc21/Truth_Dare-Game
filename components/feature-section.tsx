@@ -46,7 +46,7 @@ export function FeatureSteps({
   return (
     <div className={cn("p-4 md:p-6", className)}>
       <div className="max-w-7xl mx-auto w-full">
-        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-center">
+        <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-12 text-center">
           {title}
         </h2>
 

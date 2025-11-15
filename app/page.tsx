@@ -1,4 +1,4 @@
-import { CtaSection } from "@/components/cta_Section";
+import CTA_SECTION from "@/components/cta";
 import FAQ from "@/components/faq";
 import { FeaturesStep } from "@/components/features";
 import { Footer } from "@/components/footer-section";
@@ -6,6 +6,7 @@ import HeroSection from "@/components/hero";
 
 import { LogoLoopMarquee } from "@/components/logo_marquee";
 import { Navbar } from "@/components/navbar";
+
 import Testimonials from "@/components/testimonials";
 
 const Home = () => {
@@ -14,13 +15,22 @@ const Home = () => {
       {/* <Navbar /> */}
       <Navbar />
 
-      <HeroSection />
+      <section id="home">
+        <HeroSection />
+      </section>
       <LogoLoopMarquee />
-      <FeaturesStep />
+      <section id="features">
+        <FeaturesStep />
+      </section>
+      <CTA_SECTION />
 
-      <FAQ />
-      <CtaSection />
-      <Testimonials />
+      <section id="faq">
+        <FAQ />
+      </section>
+
+      <section id="testimonials">
+        <Testimonials />
+      </section>
       <Footer />
     </div>
   );

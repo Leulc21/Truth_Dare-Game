@@ -14,7 +14,7 @@ const logos = [
 
 export function LogoLoopMarquee() {
   return (
-    <div className="relative w-full">
+    <div className="relative w-full mb-24 mt-16">
       <Marquee pauseOnHover className="[--duration:20s]">
         {/* render plain svg images inline with spacing */}
         {logos.map((logo) => (
