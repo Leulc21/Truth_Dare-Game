@@ -1,45 +1,102 @@
+// app/play/[id]/page.tsx - FIXED
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { Navbar } from "@/components/navbar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, RotateCw, X } from "lucide-react";
+import { ArrowLeft, Loader2, RotateCw, X } from "lucide-react";
 import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
 
-const mockQuestions = [
-  {
-    truth: "What's the most embarrassing thing you've ever done on a date?",
-    dare: "Do your best impression of someone in this room for 30 seconds",
-  },
-  {
-    truth: "What's a secret you've never told anyone in this group?",
-    dare: "Send a text to your crush (or ex) saying 'thinking about you'",
-  },
-  {
-    truth: "Who in this room would you trust with your deepest secret?",
-    dare: "Let someone go through your phone for 1 minute",
-  },
-  {
-    truth: "What's the biggest lie you've ever told?",
-    dare: "Post an embarrassing selfie on social media right now",
-  },
-];
+interface Question {
+  type: string;
+  question: string;
+}
+
+interface Game {
+  id: number;
+  title?: string;
+  category: string;
+  difficulty: string;
+  environment: string;
+  totalPlayers: number;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+}
 
 const Play = () => {
+  const params = useParams();
+  const router = useRouter();
+  const gameId = params.id as string;
+
+  const [game, setGame] = useState<Game | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [generatingQuestions, setGeneratingQuestions] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
-  const currentQuestion = mockQuestions[currentIndex];
 
-  const currentType = isFlipped ? "Dare" : "Truth";
-  const currentText = isFlipped ? currentQuestion.dare : currentQuestion.truth;
+  useEffect(() => {
+    const loadGameAndQuestions = async () => {
+      try {
+        setLoading(true);
+
+        // 1. Get game info
+        const gameRes = await fetch(`/api/games/${gameId}`);
+        if (!gameRes.ok) {
+          if (gameRes.status === 404) {
+            throw new Error("Game not found");
+          }
+          throw new Error("Failed to load game");
+        }
+
+        const gameData = await gameRes.json();
+        setGame(gameData);
+
+        // 2. Generate questions for this game
+        setGeneratingQuestions(true);
+        const questionsRes = await fetch("/api/generate-questions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            category: gameData.category,
+            difficulty: gameData.difficulty,
+            environment: gameData.environment,
+          }),
+        });
+
+        if (!questionsRes.ok) {
+          throw new Error("Failed to generate questions");
+        }
+
+        const { questions: generatedQuestions } = await questionsRes.json();
+        setQuestions(generatedQuestions || []);
+      } catch (err) {
+        console.error("Error loading game:", err);
+        setError(err instanceof Error ? err.message : "Failed to load game");
+      } finally {
+        setLoading(false);
+        setGeneratingQuestions(false);
+      }
+    };
+
+    if (gameId) {
+      loadGameAndQuestions();
+    }
+  }, [gameId]);
 
   const handleNext = () => {
+    if (!questions.length) return;
+
     setIsFlipped(false);
     setTimeout(() => {
-      setCurrentIndex((prev) => (prev + 1) % mockQuestions.length);
+      setCurrentIndex((prev) => (prev + 1) % questions.length);
     }, 300);
   };
 
@@ -47,13 +104,97 @@ const Play = () => {
     setIsFlipped(!isFlipped);
   };
 
+  const handleEndGame = () => {
+    router.push("/dashboard");
+  };
+
+  // ✅ FIX: Get current question based on flip state
+  const getCurrentQuestionText = () => {
+    if (!questions.length) return "No questions available";
+
+    const currentQuestion = questions[currentIndex];
+
+    if (isFlipped) {
+      // Show dare question when flipped
+      return currentQuestion.type === "dare"
+        ? currentQuestion.question
+        : "No dare question available";
+    } else {
+      // Show truth question when not flipped
+      return currentQuestion.type === "truth"
+        ? currentQuestion.question
+        : "No truth question available";
+    }
+  };
+
+  const currentText = getCurrentQuestionText();
+  const currentType = isFlipped ? "dare" : "truth";
+
+  if (loading) {
+    return (
+      <div className="min-h-screen">
+        <Navbar />
+        <main className="container mx-auto px-6 pt-32 pb-20">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
+              <p className="text-xl">Loading game...</p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (generatingQuestions) {
+    return (
+      <div className="min-h-screen">
+        <Navbar />
+        <main className="container mx-auto px-6 pt-32 pb-20">
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <div className="text-center">
+              <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-primary" />
+              <p className="text-xl">Generating questions...</p>
+              <p className="text-sm text-muted-foreground mt-2">
+                Creating AI-powered questions
+              </p>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (error || !game) {
+    return (
+      <div className="min-h-screen">
+        <Navbar />
+        <main className="container mx-auto px-6 pt-32 pb-20">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold mb-4">Game Not Found</h1>
+              <p className="text-muted-foreground text-lg">
+                {error || "The game you're looking for doesn't exist."}
+              </p>
+            </div>
+            <Link href="/dashboard">
+              <Button className="bg-gradient-to-r from-primary to-secondary">
+                <ArrowLeft className="mr-2 w-4 h-4" />
+                Back to Dashboard
+              </Button>
+            </Link>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen">
       <Navbar />
 
       <main className="container mx-auto px-6 pt-32 pb-20">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
           <div className="flex items-center justify-between mb-12">
             <Link href="/dashboard">
               <Button variant="ghost" className="glass">
@@ -61,36 +202,41 @@ const Play = () => {
                 Back to Dashboard
               </Button>
             </Link>
-            <div className="flex gap-2">
-              <Button variant="ghost" className="glass">
-                <X className="w-4 h-4" />
-              </Button>
+            <div className="text-center">
+              <h1 className="text-2xl font-bold gradient-text">
+                {game.title || "Untitled Game"}
+              </h1>
+              <p className="text-sm text-muted-foreground capitalize">
+                {game.category}
+              </p>
             </div>
+            <Button variant="ghost" className="glass" onClick={handleEndGame}>
+              <X className="w-4 h-4" />
+            </Button>
           </div>
 
-          {/* Game Stats */}
           <div className="flex items-center justify-center gap-8 mb-12">
             <div className="text-center">
               <p className="text-sm text-muted-foreground mb-1">Question</p>
               <p className="text-2xl font-bold gradient-text">
-                {currentIndex + 1} / {mockQuestions.length}
+                {currentIndex + 1} / {questions.length}
               </p>
             </div>
             <div className="w-px h-12 bg-white/10" />
             <div className="text-center">
               <p className="text-sm text-muted-foreground mb-1">Players</p>
-              <p className="text-2xl font-bold">6</p>
+              <p className="text-2xl font-bold">{game.totalPlayers}</p>
             </div>
             <div className="w-px h-12 bg-white/10" />
             <div className="text-center">
               <p className="text-sm text-muted-foreground mb-1">Difficulty</p>
-              <p className="text-2xl font-bold text-primary">Spicy</p>
+              <p className="text-2xl font-bold text-primary capitalize">
+                {game.difficulty}
+              </p>
             </div>
           </div>
 
-          {/* Card Container */}
           <div className="relative min-h-[400px] flex items-center justify-center mb-12">
-            {/* Glow effect */}
             <div
               className={`absolute inset-0 rounded-3xl blur-3xl transition-all duration-700 ${
                 isFlipped ? "bg-secondary/20" : "bg-primary/20"
@@ -138,10 +284,13 @@ const Play = () => {
                         </span>
                       </div>
                       <p className="text-2xl md:text-3xl font-medium leading-relaxed">
-                        {currentQuestion.truth}
+                        {currentType === "truth"
+                          ? currentText
+                          : "Click to flip to Truth"}
                       </p>
                       <p className="text-sm text-muted-foreground mt-8">
-                        Click to flip • Showing Truth side
+                        Click to flip • Showing {isFlipped ? "Dare" : "Truth"}{" "}
+                        side
                       </p>
                     </motion.div>
                   </Card>
@@ -167,10 +316,13 @@ const Play = () => {
                         </span>
                       </div>
                       <p className="text-2xl md:text-3xl font-medium leading-relaxed">
-                        {currentQuestion.dare}
+                        {currentType === "dare"
+                          ? currentText
+                          : "Click to flip to Dare"}
                       </p>
                       <p className="text-sm text-muted-foreground mt-8">
-                        Click to flip • Showing Dare side
+                        Click to flip • Showing {isFlipped ? "Dare" : "Truth"}{" "}
+                        side
                       </p>
                     </motion.div>
                   </Card>
@@ -179,7 +331,6 @@ const Play = () => {
             </AnimatePresence>
           </div>
 
-          {/* Action Buttons */}
           <div className="flex items-center justify-center gap-4">
             <Button
               variant="outline"
@@ -194,10 +345,19 @@ const Play = () => {
               size="lg"
               onClick={handleNext}
               className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity px-12"
+              disabled={!questions.length}
             >
               Next Question
             </Button>
           </div>
+
+          {game.environment && (
+            <div className="text-center mt-8">
+              <p className="text-sm text-muted-foreground">
+                Environment: {game.environment}
+              </p>
+            </div>
+          )}
         </div>
       </main>
     </div>
