@@ -27,10 +27,10 @@ export function AuthFormUI() {
             toast.success("Signed in With Google, redirecting...");
           },
           onError: (error) => {
-            {
+           {
               toast.error(`Error signing in: ${error.error.message}`);
-              console.error("Google Sign-in Error:", error);
-            }
+               console.error("Google Sign-in Error:", error);
+           }
           }, // Set to true if you want to redirect after sign-in
         },
       });

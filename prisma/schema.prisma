@@ -1,6 +1,5 @@
 generator client {
-  provider = "prisma-client"
-  output   = "../lib/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -9,77 +8,76 @@ datasource db {
 }
 
 model User {
-  id            String    @id
+  id            String    @id @default(cuid())
   name          String
-  email         String
-  emailVerified Boolean
+  email         String    @unique
+  emailVerified Boolean   @default(false)
   image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
   accounts      Account[]
-  games         Game[] 
+  games         Game[]
+  sessions      Session[]
 
   @@map("user")
 }
 
 model Session {
-  id        String    @id @default(cuid()) // 👈 changed
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
   expiresAt DateTime
-  token     String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
   ipAddress String?
   userAgent String?
-  userId    String    // 👈 changed
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("session")
 }
 
 model Account {
-  id                    String    @id @default(cuid()) // 👈 changed
+  id                    String    @id @default(cuid())
+  userId                String
   accountId             String
   providerId            String
-  userId                String    // 👈 changed
-  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   accessToken           String?
   refreshToken          String?
-  idToken               String?
   accessTokenExpiresAt  DateTime?
   refreshTokenExpiresAt DateTime?
   scope                 String?
+  idToken               String?
   password              String?
   createdAt             DateTime  @default(now())
   updatedAt             DateTime  @updatedAt
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  @@unique([providerId, accountId])
   @@map("account")
 }
 
 model Verification {
-  id         String    @id @default(cuid()) // 👈 changed
+  id         String   @id @default(cuid())
   identifier String
   value      String
   expiresAt  DateTime
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   @@map("verification")
 }
 
 model Game {
-  id           Int       @id @default(autoincrement()) // 👈 keep as Int (custom model)
-  title        String
+  id           Int      @id @default(autoincrement())
+  title        String?
   category     String
   difficulty   String
   environment  String
-  totalPlayers Int
-  questions    Json
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-
-  userId String  // 👈 changed to match User.id type
-  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  totalPlayers Int      @default(2)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("game")
 }
