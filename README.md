@@ -112,13 +112,13 @@ Users can create custom games, set difficulty, theme, and players, and then play
 1. Clone the repository:
 
    ```sh
-   https://github.com/Leulc21/The_Portfolio.git
+   https://github.com/Leulc21/Truth_Dare-Game.git
    ```
 
 2. Navigate to the project directory:
 
    ```sh
-   cd The_Portfolio
+   cd Truth_Dare-Game
    ```
 
 3. Install the dependencies:
