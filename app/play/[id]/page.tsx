@@ -1,4 +1,4 @@
-// app/play/[id]/page.tsx - FIXED
+// app/play/[id]/page.tsx
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
@@ -12,8 +12,8 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 
 interface Question {
-  type: string;
-  question: string;
+  truth: string;
+  dare: string;
 }
 
 interface Game {
@@ -108,22 +108,15 @@ const Play = () => {
     router.push("/dashboard");
   };
 
-  // ✅ FIX: Get current question based on flip state
   const getCurrentQuestionText = () => {
     if (!questions.length) return "No questions available";
 
     const currentQuestion = questions[currentIndex];
 
     if (isFlipped) {
-      // Show dare question when flipped
-      return currentQuestion.type === "dare"
-        ? currentQuestion.question
-        : "No dare question available";
+      return currentQuestion.dare || "No dare question available";
     } else {
-      // Show truth question when not flipped
-      return currentQuestion.type === "truth"
-        ? currentQuestion.question
-        : "No truth question available";
+      return currentQuestion.truth || "No truth question available";
     }
   };
 
@@ -284,13 +277,10 @@ const Play = () => {
                         </span>
                       </div>
                       <p className="text-2xl md:text-3xl font-medium leading-relaxed">
-                        {currentType === "truth"
-                          ? currentText
-                          : "Click to flip to Truth"}
+                        {currentText}
                       </p>
                       <p className="text-sm text-muted-foreground mt-8">
-                        Click to flip • Showing {isFlipped ? "Dare" : "Truth"}{" "}
-                        side
+                        Click to flip to Dare
                       </p>
                     </motion.div>
                   </Card>
@@ -316,13 +306,10 @@ const Play = () => {
                         </span>
                       </div>
                       <p className="text-2xl md:text-3xl font-medium leading-relaxed">
-                        {currentType === "dare"
-                          ? currentText
-                          : "Click to flip to Dare"}
+                        {currentText}
                       </p>
                       <p className="text-sm text-muted-foreground mt-8">
-                        Click to flip • Showing {isFlipped ? "Dare" : "Truth"}{" "}
-                        side
+                        Click to flip to Truth
                       </p>
                     </motion.div>
                   </Card>
