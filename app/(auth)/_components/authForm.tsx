@@ -33,21 +33,26 @@ export function AuthFormUI() {
 
   async function signInWithGoogle() {
     startGoogleTransition(async () => {
-      await authClient.signIn.social({
-        provider: "google",
-        callbackURL: "/dashboard", // redirect to homepage or dashboard
-        fetchOptions: {
-          onSuccess: () => {
-            toast.success("Signed in With Google, redirecting...");
-          },
-          onError: (error) => {
-            {
-              toast.error(`Error signing in: ${error.error.message}`);
-              console.error("Google Sign-in Error:", error);
-            }
-          }, // Set to true if you want to redirect after sign-in
-        },
-      });
+      try {
+        const result = await authClient.signIn.social({
+          provider: "google",
+          callbackURL: "/dashboard",
+        });
+
+        if (result.error) {
+          console.error("Google Sign-in Error:", result.error);
+          toast.error(
+            `Error signing in: ${result.error.message || "Unknown error"}`
+          );
+        } else {
+          toast.success("Signed in With Google, redirecting...");
+        }
+      } catch (error: any) {
+        console.error("Google Sign-in Exception:", error);
+        toast.error(
+          `Error signing in: ${error?.message || "Unknown error occurred"}`
+        );
+      }
     });
   }
 
