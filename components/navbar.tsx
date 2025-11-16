@@ -15,6 +15,7 @@ interface NavItem {
 export const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("Home");
   const pathname = usePathname();
 
   // ✅ Get session using Better Auth
@@ -40,12 +41,61 @@ export const Navbar: React.FC = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // ✅ Track active section on homepage
+  useEffect(() => {
+    if (pathname !== "/") return;
+
+    const handleScroll = () => {
+      const sections = ["features", "faq", "testimonials"];
+      const scrollPosition = window.scrollY + 100;
+
+      // Check if we're at the top
+      if (window.scrollY < 100) {
+        setActiveSection("Home");
+        return;
+      }
+
+      // Find which section is currently in view
+      for (const section of sections) {
+        const element = document.getElementById(section);
+        if (element) {
+          const { offsetTop, offsetHeight } = element;
+          if (
+            scrollPosition >= offsetTop &&
+            scrollPosition < offsetTop + offsetHeight
+          ) {
+            setActiveSection(
+              section.charAt(0).toUpperCase() + section.slice(1)
+            );
+            return;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    handleScroll(); // Check on mount
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [pathname]);
+
   // ✅ Check if link is active
-  const isLinkActive = (href: string) => {
-    if (href === "/") {
-      return pathname === "/";
+  const isLinkActive = (item: NavItem) => {
+    // For dashboard, check pathname
+    if (item.href === "/dashboard") {
+      return pathname.startsWith("/dashboard");
     }
-    return pathname.startsWith(href);
+
+    // For home page sections
+    if (pathname === "/") {
+      if (item.href === "/") {
+        return activeSection === "Home";
+      }
+      // Check if the section matches (e.g., "Features" matches "/#features")
+      return item.name === activeSection;
+    }
+
+    return false;
   };
 
   const LogoIcon: React.FC = () => (
@@ -126,7 +176,7 @@ export const Navbar: React.FC = () => {
                 key={item.name}
                 href={item.href}
                 className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
-                  isLinkActive(item.href)
+                  isLinkActive(item)
                     ? "text-white bg-gradient-to-r from-primary to-secondary shadow-lg shadow-primary/20"
                     : "text-gray-600 dark:text-gray-300 hover:text-primary hover:bg-white/10 dark:hover:bg-white/5"
                 }`}
@@ -187,7 +237,7 @@ export const Navbar: React.FC = () => {
                 key={item.name}
                 href={item.href}
                 className={`block px-4 py-3 rounded-xl text-base font-medium transition-all duration-300 ${
-                  isLinkActive(item.href)
+                  isLinkActive(item)
                     ? "text-white bg-gradient-to-r from-primary to-secondary shadow-lg"
                     : "text-gray-700 dark:text-gray-300 hover:text-primary hover:bg-gray-100 dark:hover:bg-white/5"
                 }`}
