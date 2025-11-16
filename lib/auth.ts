@@ -15,7 +15,10 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     },
   },
-  // Add base URL configuration
   baseURL: process.env.BETTER_AUTH_URL || process.env.AUTH_URL,
   basePath: "/api/auth",
+  trustedOrigins: [
+    "https://truth-dare-game-one.vercel.app",
+    "http://localhost:3000",
+  ],
 });
