@@ -18,7 +18,7 @@ export const auth = betterAuth({
   basePath: "/api/auth",
   // Trust ALL Vercel domains
   trustedOrigins: [
-    "https://truth-dare-game-one.vercel.app",
+    "https://truth-dare-game-mu.vercel.app",
     "https://*.vercel.app", // This allows all preview deployments
     "http://localhost:3000",
   ],
