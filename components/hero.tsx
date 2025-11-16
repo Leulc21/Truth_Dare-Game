@@ -57,7 +57,15 @@ const Hero: React.FC = () => (
           </h1>
 
           <TextRotate
-            texts={["work!", "fancy ✽", "right", "fast", "fun", "rock", "🕶️"]}
+            texts={[
+              "wild 🤪",
+              "bold 🔥",
+              "truthful ✦",
+              "daring ⚡",
+              "chaotic 🎉",
+              "fun 😆",
+              "epic 🕶️",
+            ]}
             mainClassName="text-primary-foreground text-3xl lg:text-4xl px-6 lg:px-8 bg-primary overflow-hidden py-2 lg:py-3 justify-center rounded-lg min-w-[200px] lg:min-w-[260px] mx-2 font-bold"
             staggerFrom="last"
             initial={{ y: "100%" }}
