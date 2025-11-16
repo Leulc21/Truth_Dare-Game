@@ -1,6 +1,16 @@
-// lib/auth-client.ts (or wherever you initialize the client)
+// auth-client.ts
 import { createAuthClient } from "better-auth/react";
 
+// More reliable base URL detection
+const getBaseURL = () => {
+  if (typeof window !== "undefined") {
+    return window.location.origin;
+  }
+  return process.env.NODE_ENV === "production"
+    ? "https://truth-dare-game-mu.vercel.app"
+    : "http://localhost:3000";
+};
+
 export const authClient = createAuthClient({
-  baseURL: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  baseURL: getBaseURL(),
 });
