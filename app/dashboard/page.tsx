@@ -295,7 +295,7 @@ const Dashboard = () => {
                   <CardContent className="mt-auto space-y-2 relative z-10 pt-0">
                     {/* Play Button */}
                     <Link href={`/play/${game.id}`}>
-                      <Button className="w-full bg-gradient-to-r from-primary via-primary/90 to-secondary hover:from-primary/90 hover:to-secondary/90 transition-all duration-300 group/btn shadow-lg shadow-primary/20 hover:shadow-primary/40">
+                      <Button className="w-full bg-gradient-to-r from-primary via-primary/90 to-secondary hover:from-primary/90 hover:to-secondary/90 transition-all duration-300 group/btn shadow-lg shadow-primary/20 hover:shadow-primary/40 mb-2">
                         <Play className="mr-2 w-4 h-4 group-hover/btn:scale-110 group-hover/btn:translate-x-0.5 transition-transform" />
                         Play Game
                       </Button>
