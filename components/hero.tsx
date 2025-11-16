@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button"; // ✅ use ShadCN button
 import React from "react";
 
+import Link from "next/link";
 import FallingCardsBackground from "./falling";
 import TextRotate from "./fancy/text/text-rotate";
 import Highlighter from "./ui/highlighter";
@@ -98,15 +99,11 @@ const Hero: React.FC = () => (
 
       {/* Buttons */}
       <div className="mt-8 sm:mt-12 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-        <Button className="w-full sm:w-auto text-sm sm:text-base">
-          Start a Game
-        </Button>
-        <Button
-          variant="secondary"
-          className="w-full sm:w-auto text-sm sm:text-base"
-        >
-          Explore Modes
-        </Button>
+        <Link href="/login">
+          <Button className="w-full sm:w-auto text-sm sm:text-base">
+            Start a Game
+          </Button>
+        </Link>
       </div>
     </div>
   </section>
